@@ -10,10 +10,12 @@ private:
     std::vector<Planet> planets;
 public:
     SolarSystem();
+    ~SolarSystem();
     void addPlanet(Planet planet);
     void update();
     void draw();
     std::vector<Planet>& getPlanets(void);
+    void populate(void);
 };
 
 #endif

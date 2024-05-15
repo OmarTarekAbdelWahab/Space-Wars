@@ -5,14 +5,57 @@
 #include "Game.cpp"  
 int width = 500, height = 500;
 Game game(width, height);
-void displayFrame(int value){
+int previous = 0;
+void drawScene(void){
 	game.render();
-	glutTimerFunc(34, displayFrame, value);
 }
+void displayFrame(int value) {
+    // Render the game
+    drawScene();
+
+    // Calculate the time elapsed since the previous frame
+    int current = glutGet(GLUT_ELAPSED_TIME);
+    float elapsed = (current - previous) / 1000.0f; // Convert milliseconds to seconds
+    previous = current;
+
+    // Calculate the frame delay to achieve approximately 30 FPS
+    float frameDelay = 1.0f / 30; // 30 FPS
+
+    // If the actual frame rate exceeds the target frame rate, increase the delay
+    if (elapsed < frameDelay) {
+        int delay = (int)((frameDelay - elapsed) * 1000); // Convert seconds back to milliseconds
+
+        // Schedule the next frame
+        glutTimerFunc(delay, displayFrame, value);
+    } else {
+        // If the frame rate is higher than the target, reduce the delay
+        // to try to bring it closer to the target frame rate
+        glutTimerFunc(0, displayFrame, value);
+    }
+}
+int previous2 = 0;
 void displayFrameCount(int value){
-	cout << game.frameCount << " Frames per second\n";
-	game.frameCount = 0;
-	glutTimerFunc(1000, displayFrameCount, value);
+	// Calculate the time elapsed since the previous frame
+	cout << game.frameCount << " Frames Per Second" << endl;
+	game.frameCount = 0; 
+    int current = glutGet(GLUT_ELAPSED_TIME);
+    float elapsed = (current - previous2) / 1000.0f; // Convert milliseconds to seconds
+    previous2 = current;
+
+    // Calculate the frame delay to achieve approximately 30 FPS
+    float frameDelay = 1.0f / 1; // 30 FPS
+	
+    // If the actual frame rate exceeds the target frame rate, increase the delay
+    if (elapsed < frameDelay) {
+        int delay = (int)((frameDelay - elapsed) * 1000); // Convert seconds back to milliseconds
+
+        // Schedule the next frame
+        glutTimerFunc(delay, displayFrameCount, value);
+    } else {
+        // If the frame rate is higher than the target, reduce the delay
+        // to try to bring it closer to the target frame rate
+        glutTimerFunc(0, displayFrameCount, value);
+    }
 }
 // Main routine.
 int main(int argc, char **argv)
@@ -22,9 +65,7 @@ int main(int argc, char **argv)
 	glutInitWindowSize(width, height);
 	glutInitWindowPosition(100, 100);
 	glutCreateWindow("Space Wars.cpp");
-	glutDisplayFunc([](){
-		game.render();
-	});
+	glutDisplayFunc(drawScene);
 	glutReshapeFunc([](int w, int h){
 		game.resize(w, h);
 	});
