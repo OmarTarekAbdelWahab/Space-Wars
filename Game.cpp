@@ -31,7 +31,7 @@ public:
         solarSystem.populate();
         memset(keyState, false, sizeof(bool)*sizeof(keyState));
         frameCount = 0;
-        isSurvival = false;
+        isSurvival = true;
         level = 0;
         time = 510;
     }
@@ -134,21 +134,14 @@ public:
         solarSystem.update();
         player.update();
         playerView();
-        // mapView();
+        mapView();
 
-        
-        
         glutSwapBuffers();
     }
     void playerView(void){
         glViewport(0, 0, width, height);
         glLoadIdentity();
         renderText();
-        // renderText(0, 0, "Time Left: " + to_string(time));
-        // renderText(20, 0, "Time Left: " + to_string(time));
-        // renderText(-20, 0, "Time Left: " + to_string(time));
-        // renderText(0, 20, "Time Left: " + to_string(time));
-        // renderText(0, -20, "Time Left: " + to_string(time));
         player.drawHealthBar();
         // glScalef()
         gluLookAt(
