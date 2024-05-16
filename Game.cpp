@@ -1,5 +1,6 @@
 #include <GL/glew.h>
 #include <GL/freeglut.h> 
+#include <chrono>
 #include "Player.h"
 #include "Sphere.h"
 #include "Planet.h"
@@ -14,6 +15,10 @@ private:
     int width, height;
     Player player;
     // Planet planet;
+    int time;
+    std::chrono::high_resolution_clock::time_point prev_time = std::chrono::high_resolution_clock::now();
+    int level;
+    bool isSurvival;
     bool keyState[256];
     SolarSystem solarSystem;
     vector<Bullet> bullets;
@@ -26,10 +31,70 @@ public:
         solarSystem.populate();
         memset(keyState, false, sizeof(bool)*sizeof(keyState));
         frameCount = 0;
-        enemies.emplace_back(Sphere(40.0, 0.0, 40.0, 5.0), vector<GLfloat>{1.0, 1.0, 0.0}, 30.0, 1.0, 100, 1);
-        enemies.emplace_back(Sphere(-40.0, 0.0, -40.0, 5.0), vector<GLfloat>{1.0, 0.0, 1.0}, 130.0, 1.0, 100, 1);
-        enemies.emplace_back(Sphere(40.0, 0.0, -40.0, 5.0), vector<GLfloat>{1.0, 1.0, 1.0}, 230.0, 1.0, 100, 1);
+        isSurvival = false;
+        level = 0;
+        time = 510;
+        // updateGame(isSurvival);
+        // enemies.emplace_back(Sphere(40.0, 0.0, 40.0, 5.0), vector<GLfloat>{1.0, 1.0, 0.0}, 30.0, 1.0, 100, 1);
+        // enemies.emplace_back(Sphere(-40.0, 0.0, -40.0, 5.0), vector<GLfloat>{1.0, 0.0, 1.0}, 130.0, 1.0, 100, 1);
+        // enemies.emplace_back(Sphere(40.0, 0.0, -40.0, 5.0), vector<GLfloat>{1.0, 1.0, 1.0}, 230.0, 1.0, 100, 1);
     }
+    void updateGame(bool isSurvival){
+        if(isSurvival){
+            if(player.getHealth() <= 0){
+                renderText(-4.5, 4.5, "Game Over!!!");
+                return;
+            }
+            if(enemies.size() == 0){
+                level++;
+                for(int i = 0; i < level*2; i++){
+                GLfloat x = rand()%1000 - 500;
+                GLfloat z = rand()%1000 - 500;
+                GLfloat angle = rand()%360;
+                enemies.emplace_back(Sphere(x, 0.0, z, 5.0), vector<GLfloat>{1.0, 1.0, 0.0}, angle, 1.0, 100, 1);
+                }
+            }
+            renderText(-4.5, 4.5, "Level: " + to_string(level));
+        }
+        else{
+            renderText(-4.5, 4.5, "Time Left: " + to_string(time));
+            auto now_time = std::chrono::high_resolution_clock::now();
+            if(now_time - prev_time >= std::chrono::seconds(1)){
+                prev_time = now_time;
+                time--;
+                if(time == 0){
+                    renderText(-4.5, 4.5, "Game Over!!!");
+                    return;
+                }
+                else if(time%100 == 0){
+                    level++;
+                }
+                else if(time%10 == 0){
+                    for(int i = 0; i < level; i++){
+                        GLfloat x = rand()%1000 - 500;
+                        GLfloat z = rand()%1000 - 500;
+                        GLfloat angle = rand()%360;
+                        enemies.emplace_back(Sphere(x, 0.0, z, 5.0), vector<GLfloat>{1.0, 1.0, 0.0}, angle, 1.0, 100, 1);
+                    }
+                }
+                if(enemies.size() == 0){
+                    renderText(-4.5, 4.5, "You Win!!!");
+                return;
+                }
+            }
+                
+            
+            
+        }
+    }
+
+    void renderText(float x, float y, std::string text) {
+        glRasterPos2f(x, y);
+        for (char c : text) {
+            glutBitmapCharacter(GLUT_BITMAP_9_BY_15, c);
+        }
+    }
+
     void render(void){
         frameCount++;
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -56,6 +121,7 @@ public:
         // cout << "Bullets Size: " << bullets.size() << endl;
         // cout << "Enemy Size: " << enemies.size() << endl;
         // cout << player.getSphere().x << ' ' << player.getSphere().z << ' ' << player.getAngle() << endl;
+        updateGame(isSurvival);
         solarSystem.update();
         player.update();
         playerView();

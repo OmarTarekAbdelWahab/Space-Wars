@@ -35,6 +35,9 @@ void Player::takeDamage(int damage){
     health = max(0, health - damage);
     // if health < 0 -> die
 }
+int Player::getHealth(){
+    return health;
+}
 void Player::upgradeWeapon(){
     upgrade = 30;
 }

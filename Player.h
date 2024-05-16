@@ -20,6 +20,7 @@ public:
     void update() override;
     void draw() override;
     void takeDamage(int damage);
+    int getHealth();
     // void addWeapon(Weapon weapon);
     void increaseHealth(int amount);
     bool move(bool key[]);
