@@ -34,42 +34,37 @@ public:
         isSurvival = false;
         level = 0;
         time = 510;
-        // updateGame(isSurvival);
-        // enemies.emplace_back(Sphere(40.0, 0.0, 40.0, 5.0), vector<GLfloat>{1.0, 1.0, 0.0}, 30.0, 1.0, 100, 1);
-        // enemies.emplace_back(Sphere(-40.0, 0.0, -40.0, 5.0), vector<GLfloat>{1.0, 0.0, 1.0}, 130.0, 1.0, 100, 1);
-        // enemies.emplace_back(Sphere(40.0, 0.0, -40.0, 5.0), vector<GLfloat>{1.0, 1.0, 1.0}, 230.0, 1.0, 100, 1);
     }
     void updateGame(bool isSurvival){
         if(isSurvival){
             if(player.getHealth() <= 0){
-                renderText(-4.5, 4.5, "Game Over!!!");
+                // game will stop
                 return;
             }
             if(enemies.size() == 0){
                 level++;
                 for(int i = 0; i < level*2; i++){
-                GLfloat x = rand()%1000 - 500;
-                GLfloat z = rand()%1000 - 500;
-                GLfloat angle = rand()%360;
-                enemies.emplace_back(Sphere(x, 0.0, z, 5.0), vector<GLfloat>{1.0, 1.0, 0.0}, angle, 1.0, 100, 1);
+                    GLfloat x = rand()%1000 - 500;
+                    GLfloat z = rand()%1000 - 500;
+                    GLfloat angle = rand()%360;
+                    enemies.emplace_back(Sphere(x, 0.0, z, 5.0), vector<GLfloat>{1.0, 1.0, 0.0}, angle, 1.0, 100, 1);
                 }
             }
-            renderText(-4.5, 4.5, "Level: " + to_string(level));
         }
         else{
-            renderText(-4.5, 4.5, "Time Left: " + to_string(time));
             auto now_time = std::chrono::high_resolution_clock::now();
             if(now_time - prev_time >= std::chrono::seconds(1)){
                 prev_time = now_time;
                 time--;
                 if(time == 0){
-                    renderText(-4.5, 4.5, "Game Over!!!");
+                    // game will stop ... you win
                     return;
                 }
                 else if(time%100 == 0){
                     level++;
                 }
-                else if(time%10 == 0){
+
+                if(time%10 == 0){
                     for(int i = 0; i < level; i++){
                         GLfloat x = rand()%1000 - 500;
                         GLfloat z = rand()%1000 - 500;
@@ -78,8 +73,10 @@ public:
                     }
                 }
                 if(enemies.size() == 0){
-                    renderText(-4.5, 4.5, "You Win!!!");
-                return;
+                    // you win
+                    // game will stop
+                    // renderText(-4.5, 4.5, "You Win!!!");
+                    return;
                 }
             }
                 
@@ -88,11 +85,23 @@ public:
         }
     }
 
-    void renderText(float x, float y, std::string text) {
-        glRasterPos2f(x, y);
-        for (char c : text) {
-            glutBitmapCharacter(GLUT_BITMAP_9_BY_15, c);
+    void renderText() {
+        // draw health bar:
+        string text;
+        if(isSurvival){
+            text = "Level: " + to_string(level);
         }
+        else{
+            text = "Time Left: " + to_string(time);
+        }
+        glPushMatrix();
+            glTranslatef(0.0, 0.0, -5.0);
+            glColor3f(1.0, 0.0, 0.0);
+            glRasterPos2f(-5, 4);
+            for (char c : text) {
+                glutBitmapCharacter(GLUT_BITMAP_9_BY_15, c);
+        }
+        glPopMatrix();  
     }
 
     void render(void){
@@ -125,7 +134,7 @@ public:
         solarSystem.update();
         player.update();
         playerView();
-        mapView();
+        // mapView();
 
         
         
@@ -134,6 +143,12 @@ public:
     void playerView(void){
         glViewport(0, 0, width, height);
         glLoadIdentity();
+        renderText();
+        // renderText(0, 0, "Time Left: " + to_string(time));
+        // renderText(20, 0, "Time Left: " + to_string(time));
+        // renderText(-20, 0, "Time Left: " + to_string(time));
+        // renderText(0, 20, "Time Left: " + to_string(time));
+        // renderText(0, -20, "Time Left: " + to_string(time));
         player.drawHealthBar();
         // glScalef()
         gluLookAt(
