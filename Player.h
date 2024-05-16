@@ -2,6 +2,8 @@
 #include "GameObject.h"
 #include <GL/glew.h>
 #include <GL/freeglut.h> 
+#include <vector>
+#include "Bullet.h"
 
 #ifndef PLAYER_H_
 #define PLAYER_H_
@@ -9,8 +11,8 @@
 class Player: public GameObject{
 private:
     GLfloat angle, speed;
-    int health, score;
-    int list;
+    int health, score, maxHealth;
+    int list, upgrade, shootDelay;
     //Weapon weapon;
 public:
     Player();
@@ -20,8 +22,11 @@ public:
     void takeDamage(int damage);
     // void addWeapon(Weapon weapon);
     void increaseHealth(int amount);
-    void move(bool key[]);
+    bool move(bool key[]);
     GLfloat getAngle();
+    void upgradeWeapon(void);
+    std::vector<Bullet> shoot(void);
+    void drawHealthBar(void);
 };
 
 #endif
