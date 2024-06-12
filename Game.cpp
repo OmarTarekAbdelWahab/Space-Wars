@@ -13,6 +13,9 @@
 #define SURVIVAL 0
 #define TIMER 1
 
+#define MENU 0
+#define GAME 1
+
 using namespace std;
 
 class Game{
@@ -213,5 +216,27 @@ public:
     {
         glutPostRedisplay();
     }
-
+    void mouseInput(int button, int state, int x, int y){
+        cout << "Mouse Clicked at: " << x << ' ' << y << endl;
+        cout << "Game Mode: " << game_mode.getDisplay() << endl;
+        // if(game_mode.getDisplay() == MENU){
+            // if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+                // if (x >= 10 && x <= 100 && y >= 10 && y <= 30) {
+                    // Option 1 was clicked
+            // cout << "Option 1 was clicked" << endl;
+            // game_mode.chooseMode(SURVIVAL);
+                // } else if (x >= 10 && x <= 100 && y >= 30 && y <= 50) {
+                //     // Option 2 was clicked
+                //     // isOption1 = false;
+                //     cout << "Option 2 was clicked" << endl;
+                //     game_mode.chooseMode(TIMER);
+                // }
+                // else{
+                //     cout << "Mouse Clicked at: " << x << ' ' << y << endl;
+                // }
+            // }
+            // glutPostRedisplay(); // Request to redraw the screen with the new option
+        // }
+    }
+    
 };

@@ -9,6 +9,8 @@
 #define GameMode_H_
 
 class GameMode{
+    int state;
+    int dispaly;
     int game_mode;
     int time;
     int level;
@@ -19,6 +21,8 @@ public:
     void chooseMode(int game_mode);
     void update(Player& player, std::vector<Enemy>& enemies);
     void draw();
+    void drawOptions();
+    int getDisplay();
 };
 
 #endif

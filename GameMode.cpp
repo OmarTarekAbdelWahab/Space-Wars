@@ -9,13 +9,24 @@
 #define SURVIVAL 0
 #define TIMER 1
 
+#define MENU 0
+#define GAME 1
+
+#define WIN 0
+#define LOSE 1
+#define PLAY 2
+
 using namespace std;
 
-GameMode::GameMode(){}
+GameMode::GameMode(){
+    this->state = PLAY;
+    this->dispaly = MENU;
+}
 
 void GameMode::chooseMode(int game_mode){
     // take input
     this->game_mode = game_mode;
+    this->state = PLAY;
     if(game_mode == SURVIVAL){
         level = 0;
     }
@@ -29,6 +40,8 @@ void GameMode::update(Player& player, std::vector<Enemy>& enemies){
     if(this->game_mode == SURVIVAL){
         if(player.getHealth() <= 0){
             // game will stop
+            this->dispaly = MENU;
+            this->state = LOSE;
             return;
         }
         if(enemies.size() == 0){
@@ -48,6 +61,8 @@ void GameMode::update(Player& player, std::vector<Enemy>& enemies){
             time--;
             if(time == 0){
                 // game will stop ... you win
+                this->dispaly = MENU;
+                this->state = WIN;
                 return;
             }
             else if(time%100 == 0){
@@ -66,6 +81,8 @@ void GameMode::update(Player& player, std::vector<Enemy>& enemies){
                 // you win
                 // game will stop
                 // renderText(-4.5, 4.5, "You Win!!!");
+                this->dispaly = MENU;
+                this->state = WIN;
                 return;
             }
         }    
@@ -88,4 +105,19 @@ void GameMode::draw(){
             glutBitmapCharacter(GLUT_BITMAP_9_BY_15, c);
     }
     glPopMatrix();  
+}
+
+// need to put menu options on the screen and tell him if hr win or lose
+void GameMode::drawOptions(){
+    string text;
+    if(this->state == WIN){
+        text = "You Win!!!";
+    }
+    else{
+        text = "You Lose!!!";
+    }
+}
+
+int GameMode::getDisplay(){
+    return this->dispaly;
 }

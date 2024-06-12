@@ -78,6 +78,9 @@ int main(int argc, char **argv)
 	glutSpecialFunc([](int key, int x, int y){
 		game.specialKeyInput(key, x, y);
 	});
+    glutMouseFunc([](int button, int state, int x, int y) {
+        game.mouseInput(button, state, x, y);
+    });
 	
 	glewExperimental = GL_TRUE;
 	glewInit();
