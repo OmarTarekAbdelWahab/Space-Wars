@@ -191,6 +191,7 @@ public:
             Sphere planetSphere = planet.getSphere();
             if(checkSpheresIntersection(playerSphere.x, playerSphere.y, playerSphere.z, playerSphere.radius,
                 planetSphere.x, planetSphere.y, planetSphere.z, planetSphere.radius)){
+                    player.takeDamage(150);
                     cout << "Game Over\n";
                 }
         }
