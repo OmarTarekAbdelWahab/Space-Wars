@@ -1,6 +1,7 @@
 #include <GL/glew.h>
 #include <GL/freeglut.h> 
 #include "PowerUp.h"
+#include <chrono>
 #include "Player.h"
 #include "Sphere.h"
 #include "Planet.h"
@@ -9,6 +10,14 @@
 #include <math.h>
 #include "Enemy.h"
 #include <random>
+#include "GameMode.h"
+
+#define SURVIVAL 0
+#define TIMER 1
+
+#define MENU 0
+#define GAME 1
+
 using namespace std;
 
 class Game{
@@ -16,6 +25,7 @@ private:
     int width, height;
     Player player;
     // Planet planet;
+    GameMode game_mode;
     bool keyState[256];
     SolarSystem solarSystem;
     vector<Bullet> enemyBullets;
@@ -25,17 +35,27 @@ private:
 public:
     int frameCount;
     Game(int w, int h): width(w), height(h){
-        player = Player(0.0, 2., 100, 100, 10, Sphere(0., 0.0, -500., 5.));
+        this->player = Player(0.0, 2., 100, 100, 10, Sphere(0., 0.0, -500., 5.));
+        this->game_mode = GameMode();
         // planet = Planet({0}, 30., 1., .5, 12., 12, Sphere(0., 0., 0., 5.0));
         solarSystem.populate();
         memset(keyState, false, sizeof(bool)*sizeof(keyState));
         frameCount = 0;
-        enemies.emplace_back(Sphere(40.0, 0.0, 40.0, 5.0), vector<GLfloat>{1.0, 1.0, 0.0}, 30.0, 1.0, 100, 1);
-        enemies.emplace_back(Sphere(-40.0, 0.0, -40.0, 5.0), vector<GLfloat>{1.0, 0.0, 1.0}, 130.0, 1.0, 100, 1);
-        enemies.emplace_back(Sphere(40.0, 0.0, -40.0, 5.0), vector<GLfloat>{1.0, 1.0, 1.0}, 230.0, 1.0, 100, 1);
-        // powerUps.emplace_back(Sphere(200.0, 0.0, 200.0, 1.0), vector<GLfloat>{1.0, 0.0, 0.0});
-        // glutTimerFunc(5'000, spawnPowerUp, 3);
     }
+
+    
+    void restart(int mode){
+        this->player = Player(0.0, 2., 100, 100, 10, Sphere(0., 0.0, -500., 5.));
+        memset(keyState, false, sizeof(bool)*sizeof(keyState));
+        frameCount = 0;
+        playerBullets.clear();
+        enemyBullets.clear();
+        enemies.clear();
+
+        // should take it as an input
+        this->game_mode.chooseMode(mode);
+    }
+    
     void render(void){
         frameCount++;
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -85,19 +105,19 @@ public:
         // cout << "Bullets Size: " << bullets.size() << endl;
         // cout << "Enemy Size: " << enemies.size() << endl;
         // cout << player.getSphere().x << ' ' << player.getSphere().z << ' ' << player.getAngle() << endl;
+        game_mode.update(player, enemies);
         solarSystem.update();
         player.update();
         for(PowerUp& power: powerUps) power.update();
         playerView();
         mapView();
 
-        
-        
         glutSwapBuffers();
     }
     void playerView(void){
         glViewport(0, 0, width, height);
         glLoadIdentity();
+        game_mode.draw();
         player.drawHealthBar();
         // glScalef()
         gluLookAt(
@@ -192,6 +212,7 @@ public:
                     enemies.erase(enemies.begin()+eind);
                     playerBullets.erase(playerBullets.begin()+bind);
                     bind--;
+                    game_mode.update_kill();
                     break;
                 }
             }
@@ -243,4 +264,28 @@ public:
         int type = rand()%3;
         powerUps.emplace_back(Sphere(rand()%1400 - 700, 0, rand()%1400 - 700, 1.0), type);
     }
+    void mouseInput(int button, int state, int x, int y){
+        cout << "Mouse Clicked at: " << x << ' ' << y << endl;
+        cout << "Game Mode: " << game_mode.getDisplay() << endl;
+        if(game_mode.getDisplay() == MENU){
+            if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+                if (x >= 120 && x <= 375 && y >= 260 && y <= 300) {
+                    // Option 1 was clicked
+                    cout << "Option 1 was clicked" << endl;
+                    game_mode.chooseMode(SURVIVAL);
+                    restart(SURVIVAL);
+                } else if (x >= 120 && x <= 375 && y >= 310 && y <= 350) {
+                    // Option 2 was clicked
+                    cout << "Option 2 was clicked" << endl;
+                    game_mode.chooseMode(TIMER);
+                    restart(TIMER);
+                }
+                else{
+                    cout << "Mouse Clicked at: " << x << ' ' << y << endl;
+                }
+            }
+            glutPostRedisplay();
+        }
+    }
+    
 };
