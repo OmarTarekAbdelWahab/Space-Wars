@@ -2,33 +2,41 @@
 #include <math.h>
 #include <iostream>
 #include <GL/glew.h>
-#include <GL/freeglut.h>
-#include <windows.h>
-#include <mmsystem.h>
-
+#include <GL/freeglut.h> 
+#include "PowerUp.h"
 using namespace std;
-Player::Player() {}
-Player::Player(GLfloat angle, GLfloat speed, int health, int score, int list, Sphere sphere)
-    : angle(angle), speed(speed), health(health), score(score), list(list), GameObject(sphere), maxHealth(health)
-{
-    upgrade = 0;
-    shootDelay = 0;
+Player::Player(){}
+Player::Player(GLfloat angle, GLfloat speed, int health, int score, int list, Sphere sphere) 
+    : angle(angle), speed(speed), health(health), score(score), list(list), GameObject(sphere), maxHealth(health){
+        shootDelay = 0;
+        weapon = Weapon(0);
+        speedBoost = 1.0;
+        speedBoostTimer = 0;
+    }
+void Player::applyPowerUp(PowerUp powerUp){
+    if(powerUp.getType() == HEALTH) increaseHealth(powerUp.getHealthIncrease());
+    else if(powerUp.getType() == SPEED){
+        speedBoost = powerUp.getSpeedBoost();
+        speedBoostTimer = 60*6;
+    }else if(powerUp.getType() == WEAPON) upgradeWeapon();
 }
-
-void Player::increaseHealth(int amount)
-{
-    health += amount;
+void Player::increaseHealth(int amount){
+    health = min(amount + health, maxHealth);
 }
-bool Player::move(bool key[])
-{
-    if (key['d'])
-        angle -= 5.;
-    if (key['a'])
-        angle += 5.;
-    if (key['w'])
-    {
-        sphere.x += speed * sin(angle * M_PI / 180.);
-        sphere.z += speed * cos(angle * M_PI / 180.);
+bool Player::move(bool key[]){
+    if(key['d']) angle -= 5.;
+    if(key['a']) angle += 5.;
+    if(key['w']){
+        sphere.x += speedBoost*speed*sin(angle*M_PI/180.);
+        sphere.z += speedBoost*speed*cos(angle*M_PI/180.);
+    } 
+    if(key['s']){
+        sphere.x -= speedBoost*speed*sin(angle*M_PI/180.);
+        sphere.z -= speedBoost*speed*cos(angle*M_PI/180.);
+    }
+    if(speedBoostTimer > 0){
+        speedBoostTimer--;
+        if(speedBoostTimer == 0) speedBoost = 1;
     }
     if (key['s'])
     {
@@ -52,34 +60,20 @@ int Player::getHealth()
 {
     return health;
 }
-void Player::upgradeWeapon()
-{
-    upgrade = 30;
+void Player::upgradeWeapon(){
+    weapon.upgrade();
 }
 vector<Bullet> Player::shoot()
 {
     vector<Bullet> bullets;
-    shootDelay = 15;
-    if (upgrade > 0)
-    {
-        // power up
-    }
-    else
-    {
-        sndPlaySound(TEXT("Audio-Files/bullet.wav"), SND_ASYNC);
-        bullets.emplace_back(Sphere(sphere.x + sphere.radius * sin(angle * M_PI / 180.0),
-                                    sphere.y,
-                                    sphere.z + sphere.radius * cos(angle * M_PI / 180.0), 1.0),
-                             vector<GLfloat>{0.0, 0.0, 1.0}, angle, 8.0, 100);
-    }
+    shootDelay = 30;
+    bullets = weapon.getBullets(Sphere(sphere.x+sphere.radius*sin(angle*M_PI/180.0), 
+                                sphere.y,
+                                sphere.z+sphere.radius*cos(angle*M_PI/180.0), 1.0), angle);
     return bullets;
 }
-void Player::update()
-{
-    if (upgrade > 0)
-        upgrade--;
-    if (shootDelay > 0)
-        shootDelay--;
+void Player::update(){
+    if(shootDelay > 0)  shootDelay = max(0, shootDelay - (int)speedBoost);
 }
 GLfloat Player::getAngle()
 {
@@ -88,19 +82,47 @@ GLfloat Player::getAngle()
 void Player::draw()
 {
     glPushMatrix();
-    glTranslatef(sphere.x, sphere.y, sphere.z);
-    glRotatef(angle, 0.0, 1.0, 0.0);
-    glColor3f(0.0, 0.0, 1.0);
-    glutWireCone(3, sphere.radius, 16, 16);
-    glTranslatef(0., 0., 5.);
-    glColor3f(0., 1.0, 0.);
-    glutWireSphere(.5, 10, 10);
+
+        GLfloat matAmbANdDif[] = {1.0, 1.0, 0.0, 1.0};
+        GLfloat matSpec[] = {1.0, 1.0, 1.0, 1.0};
+        GLfloat matShine[] = {50.0};
+
+        glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, matAmbANdDif);
+        glMaterialfv(GL_FRONT, GL_SPECULAR, matSpec);
+        glMaterialfv(GL_FRONT, GL_SHININESS, matShine);
+
+        glTranslatef(sphere.x, sphere.y, sphere.z);
+        glRotatef(angle, 0.0, 1.0, 0.0);
+        // glColor3f(0.0, 0.0, 1.0);
+        glutWireCone(3, sphere.radius, 16, 16);
+        glTranslatef(0., 0., 5.);
+        // glColor3f(0., 1.0, 0.);
+        
+        glutSolidSphere(.5, 10, 10);
     glPopMatrix();
 }
-void Player::drawHealthBar(void)
-{
+void Player::drawHealthBar(void){
+    glDisable(GL_LIGHTING);
     // draw health bar:
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    if(speedBoostTimer > 0){
+        glPushMatrix();
+            glTranslatef(0.0, 0.0, -5.0);
+            glColor3f(0.0, 0.0, 1.0);
+            glBegin(GL_POLYGON);
+                glVertex3f(0.0, 4.75, 0.0);
+                glVertex3f(0.0, 4.25, 0.0);
+                glVertex3f(1.0, 4.25, 0.0);
+                glVertex3f(1.0, 4.75, 0.0);
+            glEnd();
+            glBegin(GL_POLYGON);
+                glVertex3f(0.25, 5.0, 0.0);
+                glVertex3f(0.25, 4.0, 0.0);
+                glVertex3f(0.75, 4.0, 0.0);
+                glVertex3f(0.75, 5.0, 0.0);
+            glEnd();
+        glPopMatrix();
+    }
     glPushMatrix();
     glTranslatef(0.0, 0.0, -5.0);
     glColor3f(1.0, 0.0, 0.0);
@@ -119,4 +141,5 @@ void Player::drawHealthBar(void)
     glEnd();
     glPopMatrix();
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINES);
+    glEnable(GL_LIGHTING);
 }

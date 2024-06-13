@@ -24,17 +24,19 @@ GameMode::GameMode(){
     this->kills = 0;
 }
 
-void GameMode::chooseMode(int game_mode){
+void GameMode::chooseMode(int mode){
     // take input
-    this->game_mode = game_mode;
+    this->game_mode = mode;
     this->state = PLAY;
     this->display = GAME;
     this->kills = 0;
-    if(game_mode == SURVIVAL){
+    if(this->game_mode == SURVIVAL){
         level = 0;
     }
     else{
-        time = 205;
+        this->time = 205;
+        this->level = 0;
+        this->prev_time = std::chrono::high_resolution_clock::now();
     }
 }
 

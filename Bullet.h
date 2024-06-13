@@ -12,6 +12,7 @@ private:
 public:
     Bullet(Sphere sphere, std::vector<GLfloat> color, GLfloat angle, GLfloat speed, int damage);
     ~Bullet();
+    Bullet getCopy(Sphere newSphere, GLfloat newAngle);
     void update(void) override;
     void draw(void) override;
     bool destroyBullet(void);

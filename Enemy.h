@@ -10,6 +10,7 @@ private:
     int health, difficulty;
     std::vector<GLfloat> color;
     int shootDelay;
+    bool stop = false;
 public:
     Enemy();
     Enemy(Sphere sphere, std::vector<GLfloat> color, GLfloat angle, GLfloat speed, int health, int difficulty);

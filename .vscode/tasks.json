@@ -18,6 +18,8 @@
                 "${fileDirname}\\SolarSystem.cpp",
                 "${fileDirname}\\Bullet.cpp",
                 "${fileDirname}\\Enemy.cpp",
+                "${fileDirname}\\Weapon.cpp",
+                "${fileDirname}\\PowerUp.cpp",
                 "${fileDirname}\\GameMode.cpp",
                 "-lopengl32",
                 "-lfreeglut",

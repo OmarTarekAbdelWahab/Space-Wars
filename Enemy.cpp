@@ -14,6 +14,8 @@ bool Enemy::move(Sphere targetLoc){
     angle = atan((dx) / (float)(dz))*180/M_PI;
     if(dz < 0) angle += 180.0;
     if(angle < 0) angle += 360.;
+    if(dz*dz + dx*dx <= 30*30) stop = true;
+    else stop = false;
     if(rand()/(double)RAND_MAX < 0.005) return true;
     return false;
 }
@@ -25,19 +27,30 @@ std::vector<Bullet> Enemy::shoot(void){
     return bullets;
 }
 void Enemy::update(void){
-    sphere.x += speed*sin(angle*M_PI/180.);
-    sphere.z += speed*cos(angle*M_PI/180.);
+    if(not stop){
+        sphere.x += speed*sin(angle*M_PI/180.);
+        sphere.z += speed*cos(angle*M_PI/180.);
+    }
     if(shootDelay > 0) shootDelay--;
 }
 void Enemy::draw(void){
     glPushMatrix();
+        GLfloat matAmbANdDif[] = {color[0], color[1], color[2], 1.0};
+        GLfloat matSpec[] = {1.0, 1.0, 1.0, 1.0};
+        GLfloat matShine[] = {50.0};
+
+        glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, matAmbANdDif);
+        glMaterialfv(GL_FRONT, GL_SPECULAR, matSpec);
+        glMaterialfv(GL_FRONT, GL_SHININESS, matShine);
+
+
         glTranslatef(sphere.x, sphere.y, sphere.z);
         glRotatef(angle, 0.0, 1.0, 0.0);
-        glColor3fv(color.data());
+        // glColor3fv(color.data());
         glutWireCone(3, sphere.radius, 16, 16);
         glTranslatef(0., 0., 5.);
-        glColor3f(0., 1.0, 0.);
-        glutWireSphere(.5, 10, 10);
+        // glColor3f(0., 1.0, 0.);
+        glutSolidSphere(.5, 10, 10);
 
 
         // glTranslatef(sphere.x, sphere.y, sphere.z);
