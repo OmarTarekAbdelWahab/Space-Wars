@@ -1,5 +1,6 @@
 #include <GL/glew.h>
 #include <GL/freeglut.h> 
+#include "PowerUp.h"
 #include "Player.h"
 #include "Sphere.h"
 #include "Planet.h"
@@ -7,6 +8,7 @@
 #include <iostream>
 #include <math.h>
 #include "Enemy.h"
+#include <random>
 using namespace std;
 
 class Game{
@@ -16,8 +18,10 @@ private:
     // Planet planet;
     bool keyState[256];
     SolarSystem solarSystem;
-    vector<Bullet> bullets;
+    vector<Bullet> enemyBullets;
+    vector<Bullet> playerBullets;
     vector<Enemy> enemies;
+    vector<PowerUp> powerUps;
 public:
     int frameCount;
     Game(int w, int h): width(w), height(h){
@@ -29,27 +33,52 @@ public:
         enemies.emplace_back(Sphere(40.0, 0.0, 40.0, 5.0), vector<GLfloat>{1.0, 1.0, 0.0}, 30.0, 1.0, 100, 1);
         enemies.emplace_back(Sphere(-40.0, 0.0, -40.0, 5.0), vector<GLfloat>{1.0, 0.0, 1.0}, 130.0, 1.0, 100, 1);
         enemies.emplace_back(Sphere(40.0, 0.0, -40.0, 5.0), vector<GLfloat>{1.0, 1.0, 1.0}, 230.0, 1.0, 100, 1);
+        // powerUps.emplace_back(Sphere(200.0, 0.0, 200.0, 1.0), vector<GLfloat>{1.0, 0.0, 0.0});
+        // glutTimerFunc(5'000, spawnPowerUp, 3);
     }
     void render(void){
         frameCount++;
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(0., 0., 0., 0.);
+        
+        float lightAmb[] = {0.0, 0.0, 0.0, 1.0};
+        float lightDifAndSpec[] = {1.0, 1.0, 1.0, 1.0};
+        float lightPos[] = {0.0, 100.0, 0.0, 1.0};
+        float globAmb[] = {0.5, 0.5, 0.5, 1.0};
+        glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmb);
+        glLightfv(GL_LIGHT0, GL_DIFFUSE, lightDifAndSpec);
+        glLightfv(GL_LIGHT0, GL_SPECULAR, lightDifAndSpec);
+
+        glLightModelfv(GL_LIGHT_MODEL_AMBIENT, globAmb);
+        glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, 1);
+        
+        glEnable(GL_LIGHT0);
+
+        // glLightf(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, t);
+
         handleCollision();
         if(player.move(keyState)){
             vector<Bullet> newBullets = player.shoot();
-            for(Bullet& bullet: newBullets) bullets.emplace_back(bullet);
+            for(Bullet& bullet: newBullets) playerBullets.emplace_back(bullet);
         }
         for(Enemy& enemy: enemies) {
             if(enemy.move(player.getSphere())){
                 vector<Bullet> newBullets = enemy.shoot();
-                for(Bullet& bullet: newBullets) bullets.emplace_back(bullet);
+                for(Bullet& bullet: newBullets) enemyBullets.emplace_back(bullet);
             }
             enemy.update();
         }
-        for(int i = 0; i < bullets.size(); i++){
-            bullets[i].update();
-            if(bullets[i].destroyBullet()){
-                bullets.erase(bullets.begin()+i);
+        for(int i = 0; i < enemyBullets.size(); i++){
+            enemyBullets[i].update();
+            if(enemyBullets[i].destroyBullet()){
+                enemyBullets.erase(enemyBullets.begin()+i);
+                i--;
+            }
+        } 
+        for(int i = 0; i < playerBullets.size(); i++){
+            playerBullets[i].update();
+            if(playerBullets[i].destroyBullet()){
+                playerBullets.erase(playerBullets.begin()+i);
                 i--;
             }
         } 
@@ -58,6 +87,7 @@ public:
         // cout << player.getSphere().x << ' ' << player.getSphere().z << ' ' << player.getAngle() << endl;
         solarSystem.update();
         player.update();
+        for(PowerUp& power: powerUps) power.update();
         playerView();
         mapView();
 
@@ -81,17 +111,20 @@ public:
         updateScene();
     }
     void mapView(void){
-        glViewport(width*3/4, height*3/4, width*1/4, height*1/4);
+        // cout << "Width " << width << " Height " << height << endl;
+        glViewport(width*2/3, height*2/3, width*1/3, height*1/3);
         glLoadIdentity();
         // Draw a vertical line on the left of the viewport to separate the two viewports
-        glColor3f(1.0, 1.0, 1.0);
         glLineWidth(2.0);
+        glDisable(GL_LIGHTING);
+        glColor3f(1.0, 1.0, 1.0);
         glBegin(GL_LINE_LOOP);
             glVertex3f(-5.0, -5.0, -5.0);
             glVertex3f(-5.0, 5.0, -5.0);
             glVertex3f(5.0, 5.0, -5.0);
             glVertex3f(5.0, -5.0, -5.0);
         glEnd();
+        glEnable(GL_LIGHTING);
         glLineWidth(1.0);
 
         gluLookAt(0.0, 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0);
@@ -102,6 +135,12 @@ public:
     {
         glClearColor(1.0, 1.0, 1.0, 0.0);
         glEnable(GL_DEPTH_TEST); // Enable depth testing.
+        glEnable(GL_LIGHTING);
+
+        
+
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
     }
     // OpenGL window reshape routine.
     void resize(int w, int h)
@@ -109,22 +148,24 @@ public:
         glViewport(0, 0, w, h);
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        glFrustum(-5.0, 5.0, -5.0, 5.0, 5.0, 1000.0);
+        glFrustum(-5.0 - (w - 500) / 100.0, 5.0 + (w - 500) / 100.0, -5.0 - (h - 500) / 100.0, 5.0 + (h - 500) / 100.0, 5.0, 2000.0);
 
         glMatrixMode(GL_MODELVIEW);
         width = w, height = h;
     }
     void updateScene(void){
-        player.draw();
+        float lightPos[] = {0.0, 0.0, 0.0, 1.0};
+        glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
+        
         solarSystem.draw();
+        player.draw();
         for(Enemy& enemy: enemies) enemy.draw();
-        for(Bullet& bullet: bullets) bullet.draw();
-        glPushMatrix();
-            glColor3f(1.0, 1.0, 0.0);
-            glutSolidSphere(5.0, 16, 16);
-        glPopMatrix();
+        for(Bullet& bullet: enemyBullets) bullet.draw();
+        for(Bullet& bullet: playerBullets) bullet.draw();
+        for(PowerUp& power: powerUps) power.draw();
     }
     void handleCollision(){
+        // Collision Player & Planet
         Sphere playerSphere = player.getSphere();
         for(Planet& planet: solarSystem.getPlanets()){
             Sphere planetSphere = planet.getSphere();
@@ -133,55 +174,49 @@ public:
                     cout << "Game Over\n";
                 }
         }
-        for(Enemy& enemy: enemies){
-            Sphere enemySphere = enemy.getSphere();
-            if(checkSpheresIntersection(playerSphere.x, playerSphere.y, playerSphere.z, playerSphere.radius,
-                enemySphere.x, enemySphere.y, enemySphere.z, enemySphere.radius)){
-                    cout << "You Got Hit!!!\n";
-                }
-        }
-        for(int bind = 0; bind < bullets.size(); bind++){
-            bool isHit = false;
-            Sphere bulletSphere = bullets[bind].getSphere();
+        // // Collision Enemy Body & Player Body (Not Used Anymore)
+        // for(Enemy& enemy: enemies){
+        //     Sphere enemySphere = enemy.getSphere();
+        //     if(checkSpheresIntersection(playerSphere.x, playerSphere.y, playerSphere.z, playerSphere.radius,
+        //         enemySphere.x, enemySphere.y, enemySphere.z, enemySphere.radius)){
+        //             cout << "You Got Hit!!!\n";
+        //         }
+        // }
+        // Enemy Body & Player Bullet
+        for(int bind = 0; bind < playerBullets.size(); bind++){
+            Sphere bulletSphere = playerBullets[bind].getSphere();
             for(int eind = 0; eind < enemies.size(); eind++){
                 Sphere enemySphere = enemies[eind].getSphere();
                 if(checkSpheresIntersection(bulletSphere.x, bulletSphere.y, bulletSphere.z, bulletSphere.radius,
                 enemySphere.x, enemySphere.y, enemySphere.z, enemySphere.radius)){
                     enemies.erase(enemies.begin()+eind);
-                    isHit = true;
+                    playerBullets.erase(playerBullets.begin()+bind);
+                    bind--;
                     break;
                 }
-            }
-            if(isHit){
-                bullets.erase(bullets.begin()+bind);
-                bind--;
-                continue;
-            }
-            if(checkSpheresIntersection(bulletSphere.x, bulletSphere.y, bulletSphere.z, bulletSphere.radius,
-                playerSphere.x, playerSphere.y, playerSphere.z, playerSphere.radius)){
-                    player.takeDamage(bullets[bind].getDamage());
-                    isHit = true;
-            }
-            if(isHit){
-                bullets.erase(bullets.begin()+bind);
-                bind--;
             }
         }
-        for(int eind = 0; eind < enemies.size(); eind++){
-            bool isHit = false;
-            Sphere enemySphere = enemies[eind].getSphere();
-            for(int bind = 0; bind < bullets.size(); bind++){
-                Sphere bulletSphere = bullets[bind].getSphere();
-                if(checkSpheresIntersection(bulletSphere.x, bulletSphere.y, bulletSphere.z, bulletSphere.radius,
-                enemySphere.x, enemySphere.y, enemySphere.z, enemySphere.radius)){
-                    bullets.erase(bullets.begin()+bind);
-                    isHit = true;
-                    break;
-                }
+
+
+        // Enemy Bullets & Player Body
+        for(int bind = 0; bind < enemyBullets.size(); bind++){
+            Sphere bulletSphere = enemyBullets[bind].getSphere();
+            if(checkSpheresIntersection(bulletSphere.x, bulletSphere.y, bulletSphere.z, bulletSphere.radius,
+                playerSphere.x, playerSphere.y, playerSphere.z, playerSphere.radius)){
+                    player.takeDamage(enemyBullets[bind].getDamage());
+                    enemyBullets.erase(enemyBullets.begin()+bind);
+                    bind--;
             }
-            if(isHit){
-                enemies.erase(enemies.begin()+eind);
-                eind--;
+        }
+
+        // Player Body & Power Ups
+        for(int i = 0; i < powerUps.size(); i++){
+            Sphere powerSphere = powerUps[i].getSphere();
+            if(checkSpheresIntersection(playerSphere.x, playerSphere.y, playerSphere.z, playerSphere.radius,
+                powerSphere.x, 0.0, powerSphere.z, powerSphere.radius + 2.0)){
+                    player.applyPowerUp(powerUps[i]);
+                    powerUps.erase(powerUps.begin() + i);
+                    i--;
             }
         }
     }
@@ -204,5 +239,8 @@ public:
     {
         glutPostRedisplay();
     }
-
+    void gameSpawnPowerUp(){
+        int type = rand()%3;
+        powerUps.emplace_back(Sphere(rand()%1400 - 700, 0, rand()%1400 - 700, 1.0), type);
+    }
 };

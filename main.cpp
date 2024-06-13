@@ -6,6 +6,7 @@
 int width = 500, height = 500;
 Game game(width, height);
 int previous = 0;
+int powerSpawn = 10;
 void drawScene(void){
 	game.render();
 }
@@ -36,7 +37,7 @@ void displayFrame(int value) {
 int previous2 = 0;
 void displayFrameCount(int value){
 	// Calculate the time elapsed since the previous frame
-	cout << game.frameCount << " Frames Per Second" << endl;
+	// cout << game.frameCount << " Frames Per Second" << endl;
 	game.frameCount = 0; 
     int current = glutGet(GLUT_ELAPSED_TIME);
     float elapsed = (current - previous2) / 1000.0f; // Convert milliseconds to seconds
@@ -56,6 +57,10 @@ void displayFrameCount(int value){
         // to try to bring it closer to the target frame rate
         glutTimerFunc(0, displayFrameCount, value);
     }
+}
+void spawnPowerUp(int value){
+    game.gameSpawnPowerUp();
+    glutTimerFunc(powerSpawn*1000, spawnPowerUp, value);
 }
 // Main routine.
 int main(int argc, char **argv)
@@ -84,6 +89,7 @@ int main(int argc, char **argv)
 	glutIgnoreKeyRepeat(1);
 	glutTimerFunc(34, displayFrame, 1);
 	glutTimerFunc(1000, displayFrameCount, 2);
+    glutTimerFunc(powerSpawn*1000, spawnPowerUp, 3);
 	game.setup();
 	glutMainLoop();
 }

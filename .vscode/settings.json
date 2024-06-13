@@ -1,5 +1,8 @@
 {
     "files.associations": {
+        "deque": "cpp",
+        "string": "cpp",
+        "unordered_map": "cpp",
         "vector": "cpp",
         "array": "cpp",
         "atomic": "cpp",
@@ -17,9 +20,6 @@
         "cstdlib": "cpp",
         "cwchar": "cpp",
         "cwctype": "cpp",
-        "deque": "cpp",
-        "string": "cpp",
-        "unordered_map": "cpp",
         "exception": "cpp",
         "algorithm": "cpp",
         "functional": "cpp",

@@ -1,4 +1,6 @@
 #include "Sphere.h"
+#include "Weapon.h"
+#include "PowerUp.h"
 #include "GameObject.h"
 #include <GL/glew.h>
 #include <GL/freeglut.h> 
@@ -12,8 +14,10 @@ class Player: public GameObject{
 private:
     GLfloat angle, speed;
     int health, score, maxHealth;
-    int list, upgrade, shootDelay;
-    //Weapon weapon;
+    int list, shootDelay;
+    Weapon weapon;
+    GLfloat speedBoost;
+    int speedBoostTimer;
 public:
     Player();
     Player(GLfloat angle, GLfloat speed, int health, int score, int list, Sphere shpere);
@@ -27,6 +31,7 @@ public:
     void upgradeWeapon(void);
     std::vector<Bullet> shoot(void);
     void drawHealthBar(void);
+    void applyPowerUp(PowerUp type);
 };
 
 #endif

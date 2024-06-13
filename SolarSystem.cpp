@@ -5,7 +5,7 @@
 #include <vector>
 #include <random>
 SolarSystem::SolarSystem(){
-    std::cout << "Created";
+    // std::cout << "Created";
 }
 void SolarSystem::populate(){
     // Sun
