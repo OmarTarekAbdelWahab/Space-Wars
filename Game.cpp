@@ -64,7 +64,7 @@ public:
         float lightAmb[] = {0.0, 0.0, 0.0, 1.0};
         float lightDifAndSpec[] = {1.0, 1.0, 1.0, 1.0};
         float lightPos[] = {0.0, 100.0, 0.0, 1.0};
-        float globAmb[] = {0.5, 0.5, 0.5, 1.0};
+        float globAmb[] = {0.8, 0.8, 0.8, 1.0};
         glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmb);
         glLightfv(GL_LIGHT0, GL_DIFFUSE, lightDifAndSpec);
         glLightfv(GL_LIGHT0, GL_SPECULAR, lightDifAndSpec);
