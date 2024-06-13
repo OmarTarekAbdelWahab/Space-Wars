@@ -261,7 +261,9 @@ public:
     }
     void gameSpawnPowerUp(){
         int type = rand()%3;
-        powerUps.emplace_back(Sphere(rand()%1400 - 700, 0, rand()%1400 - 700, 1.0), type);
+        if(powerUps.size() < 10){
+            powerUps.emplace_back(Sphere(rand()%1400 - 700, 0, rand()%1400 - 700, 1.0), type);
+        }
     }
     void mouseInput(int button, int state, int x, int y){
         cout << "Mouse Clicked at: " << x << ' ' << y << endl;
