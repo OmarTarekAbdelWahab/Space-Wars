@@ -23,7 +23,8 @@
                 "-lfreeglut",
                 "-lglew32",
                 "-lstdc++",
-                "-lglu32"
+                "-lglu32",
+                "-lwinmm"
             ],
             "options": {
                 "cwd": "${fileDirname}"
