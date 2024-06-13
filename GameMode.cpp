@@ -21,6 +21,7 @@ using namespace std;
 GameMode::GameMode(){
     this->state = PLAY;
     this->display = MENU;
+    this->kills = 0;
 }
 
 void GameMode::chooseMode(int game_mode){
@@ -28,12 +29,17 @@ void GameMode::chooseMode(int game_mode){
     this->game_mode = game_mode;
     this->state = PLAY;
     this->display = GAME;
+    this->kills = 0;
     if(game_mode == SURVIVAL){
         level = 0;
     }
     else{
         time = 205;
     }
+}
+
+void GameMode::update_kill(){
+    this->kills++;
 }
 
 void GameMode::update(Player& player, std::vector<Enemy>& enemies){
@@ -102,7 +108,11 @@ void GameMode::draw(){
         glRasterPos2f(-5, 4);
         for (char c : text) {
             glutBitmapCharacter(GLUT_BITMAP_9_BY_15, c);
-    }
+        }
+        glRasterPos2f(-5, 3.5);
+        for (char c : "Kills: " + to_string(this->kills)) {
+            glutBitmapCharacter(GLUT_BITMAP_9_BY_15, c);
+        }
     glPopMatrix();  
     if(this->display == MENU){
         drawOptions();

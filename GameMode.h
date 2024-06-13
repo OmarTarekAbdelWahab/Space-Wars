@@ -14,12 +14,14 @@ class GameMode{
     int game_mode;
     int time;
     int level;
+    int kills;
     std::chrono::high_resolution_clock::time_point prev_time = std::chrono::high_resolution_clock::now();
 
 public:
     GameMode();
     void chooseMode(int game_mode);
     void update(Player& player, std::vector<Enemy>& enemies);
+    void update_kill();
     void draw();
     void drawOptions();
     int getDisplay();

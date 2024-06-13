@@ -170,6 +170,7 @@ public:
                 enemySphere.x, enemySphere.y, enemySphere.z, enemySphere.radius)){
                     enemies.erase(enemies.begin()+eind);
                     isHit = true;
+                    game_mode.update_kill();
                     break;
                 }
             }
@@ -203,6 +204,7 @@ public:
             if(isHit){
                 enemies.erase(enemies.begin()+eind);
                 eind--;
+                game_mode.update_kill();
             }
         }
     }
