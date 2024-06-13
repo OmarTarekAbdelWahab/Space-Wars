@@ -31,15 +31,24 @@ private:
 public:
     int frameCount;
     Game(int w, int h): width(w), height(h){
-        player = Player(0.0, 2., 100, 100, 10, Sphere(0., 0.0, -500., 5.));
-        game_mode = GameMode();
+        this->player = Player(0.0, 2., 100, 100, 10, Sphere(0., 0.0, -500., 5.));
+        this->game_mode = GameMode();
         // planet = Planet({0}, 30., 1., .5, 12., 12, Sphere(0., 0., 0., 5.0));
         solarSystem.populate();
         memset(keyState, false, sizeof(bool)*sizeof(keyState));
         frameCount = 0;
+    }
+
+    
+    void restart(int mode){
+        this->player = Player(0.0, 2., 100, 100, 10, Sphere(0., 0.0, -500., 5.));
+        memset(keyState, false, sizeof(bool)*sizeof(keyState));
+        frameCount = 0;
+        bullets.clear();
+        enemies.clear();
 
         // should take it as an input
-        game_mode.chooseMode(SURVIVAL);
+        this->game_mode.chooseMode(mode);
     }
     
     void render(void){
@@ -161,6 +170,7 @@ public:
                 enemySphere.x, enemySphere.y, enemySphere.z, enemySphere.radius)){
                     enemies.erase(enemies.begin()+eind);
                     isHit = true;
+                    game_mode.update_kill();
                     break;
                 }
             }
@@ -194,6 +204,7 @@ public:
             if(isHit){
                 enemies.erase(enemies.begin()+eind);
                 eind--;
+                game_mode.update_kill();
             }
         }
     }
@@ -219,24 +230,25 @@ public:
     void mouseInput(int button, int state, int x, int y){
         cout << "Mouse Clicked at: " << x << ' ' << y << endl;
         cout << "Game Mode: " << game_mode.getDisplay() << endl;
-        // if(game_mode.getDisplay() == MENU){
-            // if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
-                // if (x >= 10 && x <= 100 && y >= 10 && y <= 30) {
+        if(game_mode.getDisplay() == MENU){
+            if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+                if (x >= 120 && x <= 375 && y >= 260 && y <= 300) {
                     // Option 1 was clicked
-            // cout << "Option 1 was clicked" << endl;
-            // game_mode.chooseMode(SURVIVAL);
-                // } else if (x >= 10 && x <= 100 && y >= 30 && y <= 50) {
-                //     // Option 2 was clicked
-                //     // isOption1 = false;
-                //     cout << "Option 2 was clicked" << endl;
-                //     game_mode.chooseMode(TIMER);
-                // }
-                // else{
-                //     cout << "Mouse Clicked at: " << x << ' ' << y << endl;
-                // }
-            // }
-            // glutPostRedisplay(); // Request to redraw the screen with the new option
-        // }
+                    cout << "Option 1 was clicked" << endl;
+                    game_mode.chooseMode(SURVIVAL);
+                    restart(SURVIVAL);
+                } else if (x >= 120 && x <= 375 && y >= 310 && y <= 350) {
+                    // Option 2 was clicked
+                    cout << "Option 2 was clicked" << endl;
+                    game_mode.chooseMode(TIMER);
+                    restart(TIMER);
+                }
+                else{
+                    cout << "Mouse Clicked at: " << x << ' ' << y << endl;
+                }
+            }
+            glutPostRedisplay();
+        }
     }
     
 };
