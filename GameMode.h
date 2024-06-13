@@ -10,7 +10,7 @@
 
 class GameMode{
     int state;
-    int dispaly;
+    int display;
     int game_mode;
     int time;
     int level;
