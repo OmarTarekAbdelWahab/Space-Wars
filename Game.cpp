@@ -37,7 +37,6 @@ public:
     Game(int w, int h): width(w), height(h){
         this->player = Player(0.0, 2., 100, 100, 10, Sphere(0., 0.0, -500., 5.));
         this->game_mode = GameMode();
-        // planet = Planet({0}, 30., 1., .5, 12., 12, Sphere(0., 0., 0., 5.0));
         solarSystem.populate();
         memset(keyState, false, sizeof(bool)*sizeof(keyState));
         frameCount = 0;
@@ -51,8 +50,7 @@ public:
         playerBullets.clear();
         enemyBullets.clear();
         enemies.clear();
-
-        // should take it as an input
+        powerUps.clear();
         this->game_mode.chooseMode(mode);
     }
     
