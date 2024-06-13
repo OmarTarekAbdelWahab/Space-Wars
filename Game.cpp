@@ -9,6 +9,7 @@
 #include <cmath>
 #include "Enemy.h"
 #include "GameMode.h"
+#include "getBMP.h"
 
 #define SURVIVAL 0
 #define TIMER 1
@@ -32,12 +33,11 @@ private:
 
 public:
     int frameCount;
+    unsigned int texture[16];
     Game(int w, int h) : width(w), height(h)
     {
-        player = Player(0.0, 2., 100, 100, 10, Sphere(0., 0.0, -500., 5.));
         game_mode = GameMode();
         // planet = Planet({0}, 30., 1., .5, 12., 12, Sphere(0., 0., 0., 5.0));
-        solarSystem.populate();
         memset(keyState, false, sizeof(bool) * sizeof(keyState));
         frameCount = 0;
 
@@ -79,7 +79,7 @@ public:
         // cout << "Bullets Size: " << bullets.size() << endl;
         // cout << "Enemy Size: " << enemies.size() << endl;
         // cout << player.getSphere().x << ' ' << player.getSphere().z << ' ' << player.getAngle() << endl;
-        game_mode.update(player, enemies);
+        game_mode.update(player, enemies, texture[17]);
         solarSystem.update();
         player.update();
         playerView();
@@ -96,10 +96,11 @@ public:
         // glScalef()
         gluLookAt(
             player.getSphere().x - 15. * sin(player.getAngle() * M_PI / 180.), player.getSphere().y + 9., player.getSphere().z - 15. * cos(player.getAngle() * M_PI / 180.), player.getSphere().x - 9. * sin(player.getAngle() * M_PI / 180.), player.getSphere().y + 9., player.getSphere().z - 9. * cos(player.getAngle() * M_PI / 180.), 0.0, 1.0, 0.0);
-        updateScene();
+        updateScene(true);
     }
     void mapView(void)
     {
+
         glViewport(width * 3 / 4, height * 3 / 4, width * 1 / 4, height * 1 / 4);
         glLoadIdentity();
         // Draw a vertical line on the left of the viewport to separate the two viewports
@@ -115,12 +116,51 @@ public:
 
         gluLookAt(0.0, 1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0);
         // gluLookAt(player.getSphere().x, 100., player.getSphere().z, player.getSphere().x, 0.0, player.getSphere().z, 0.0, 0.0, 1.0);
-        updateScene();
+        updateScene(false);
+    }
+    void loadTextures()
+    {
+        imageFile *image[18];
+        image[0] = getBMP("bmp texture/2k_sun.bmp");
+        image[1] = getBMP("bmp texture/2k_mercury.bmp");
+        image[2] = getBMP("bmp texture/2k_venus_surface.bmp");
+        image[3] = getBMP("bmp texture/2k_earth_daymap.bmp");
+        image[4] = getBMP("bmp texture/2k_mars.bmp");
+        image[5] = getBMP("bmp texture/2k_jupiter.bmp");
+        image[6] = getBMP("bmp texture/2k_saturn.bmp");
+        image[7] = getBMP("bmp texture/2k_uranus.bmp");
+        image[8] = getBMP("bmp texture/2k_neptune.bmp");
+        image[9] = getBMP("bmp texture/2k_moon.bmp");
+        image[10] = getBMP("bmp texture/2k_saturn_ring_alpha.bmp");
+        image[11] = getBMP("bmp texture/2k_stars_milky_way.bmp");
+        image[12] = getBMP("bmp texture/2k_venus_atmosphere.bmp");
+        image[13] = getBMP("bmp texture/sky1.bmp");
+        image[14] = getBMP("bmp texture/sky2.bmp");
+        image[15] = getBMP("bmp texture/sky3.bmp");
+        image[16] = getBMP("bmp texture/bodyMetal.bmp");
+        image[17] = getBMP("bmp texture/Red metal texture background.bmp");
+
+        for (int i = 0; i < 18; i++)
+        {
+            glBindTexture(GL_TEXTURE_2D, texture[i]);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image[i]->width, image[i]->height, 0,
+                         GL_RGBA, GL_UNSIGNED_BYTE, image[i]->data);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        }
     }
     void setup(void)
     {
         glClearColor(1.0, 1.0, 1.0, 0.0);
         glEnable(GL_DEPTH_TEST); // Enable depth testing.
+        glGenTextures(18, texture);
+        loadTextures();
+        glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+        glEnable(GL_TEXTURE_2D);
+        solarSystem.populate(texture);
+        player = Player(0.0, 2., 100, 100, 10, Sphere(0., 0.0, -500., 5.), texture[16]);
     }
     // OpenGL window reshape routine.
     void resize(int w, int h)
@@ -128,12 +168,13 @@ public:
         glViewport(0, 0, w, h);
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        glFrustum(-5.0, 5.0, -5.0, 5.0, 5.0, 1000.0);
+        glFrustum(-5.0, 5.0, -5.0, 5.0, 5.0, 8400.0);
 
         glMatrixMode(GL_MODELVIEW);
         width = w, height = h;
     }
-    void updateScene(void)
+
+    void updateScene(bool isPlayer)
     {
         player.draw();
         solarSystem.draw();
@@ -142,8 +183,83 @@ public:
         for (Bullet &bullet : bullets)
             bullet.draw();
         glPushMatrix();
-        glColor3f(1.0, 1.0, 0.0);
+        glColor3f(1.0, 1.0, 1.0);
         glutSolidSphere(5.0, 16, 16);
+
+        if (isPlayer)
+        {
+            glBindTexture(GL_TEXTURE_2D, texture[15]);
+            glBegin(GL_POLYGON);
+            glTexCoord2f(0.0, 0.0);
+            glVertex3f(-3000.0, -100.0, 3000.0);
+            glTexCoord2f(1.0, 0.0);
+            glVertex3f(3000.0, -100.0, 3000.0);
+            glTexCoord2f(1.0, 1.0);
+            glVertex3f(3000.0, -100.0, -3000.0);
+            glTexCoord2f(0.0, 1.0);
+            glVertex3f(-3000.0, -100.0, -3000.0);
+            glEnd();
+
+            glBindTexture(GL_TEXTURE_2D, texture[15]);
+            glBegin(GL_POLYGON);
+            glTexCoord2f(0.0, 0.0);
+            glVertex3f(-3000.0, 2100.0, 3000.0);
+            glTexCoord2f(1.0, 0.0);
+            glVertex3f(3000.0, 2100.0, 3000.0);
+            glTexCoord2f(1.0, 1.0);
+            glVertex3f(3000.0, 2100.0, -3000.0);
+            glTexCoord2f(0.0, 1.0);
+            glVertex3f(-3000.0, 2100.0, -3000.0);
+            glEnd();
+
+            glBindTexture(GL_TEXTURE_2D, texture[15]);
+            glBegin(GL_POLYGON);
+            glTexCoord2f(0.0, 0.0);
+            glVertex3f(-3000.0, -100.0, 3000.0);
+            glTexCoord2f(1.0, 0.0);
+            glVertex3f(-3000.0, -100.0, -3000.0);
+            glTexCoord2f(1.0, 1.0);
+            glVertex3f(-3000.0, 2100.0, -3000.0);
+            glTexCoord2f(0.0, 1.0);
+            glVertex3f(-3000.0, 2100.0, 3000.0);
+            glEnd();
+
+            glBindTexture(GL_TEXTURE_2D, texture[15]);
+            glBegin(GL_POLYGON);
+            glTexCoord2f(0.0, 0.0);
+            glVertex3f(3000.0, -100.0, 3000.0);
+            glTexCoord2f(1.0, 0.0);
+            glVertex3f(3000.0, 2100.0, 3000.0);
+            glTexCoord2f(1.0, 1.0);
+            glVertex3f(3000.0, 2100.0, -3000.0);
+            glTexCoord2f(0.0, 1.0);
+            glVertex3f(3000.0, -100.0, -3000.0);
+            glEnd();
+
+            glBindTexture(GL_TEXTURE_2D, texture[15]);
+            glBegin(GL_POLYGON);
+            glTexCoord2f(0.0, 0.0);
+            glVertex3f(3000.0, -100.0, 3000.0);
+            glTexCoord2f(1.0, 0.0);
+            glVertex3f(-3000.0, -100.0, 3000.0);
+            glTexCoord2f(1.0, 1.0);
+            glVertex3f(-3000.0, 2100.0, 3000.0);
+            glTexCoord2f(0.0, 1.0);
+            glVertex3f(3000.0, 2100.0, 3000.0);
+            glEnd();
+
+            glBindTexture(GL_TEXTURE_2D, texture[15]);
+            glBegin(GL_POLYGON);
+            glTexCoord2f(0.0, 0.0);
+            glVertex3f(-3000.0, -100.0, -3000.0);
+            glTexCoord2f(1.0, 0.0);
+            glVertex3f(3000.0, -100.0, -3000.0);
+            glTexCoord2f(1.0, 1.0);
+            glVertex3f(3000.0, 2100.0, -3000.0);
+            glTexCoord2f(0.0, 1.0);
+            glVertex3f(-3000.0, 2100.0, -3000.0);
+            glEnd();
+        }
         glPopMatrix();
     }
     void handleCollision()

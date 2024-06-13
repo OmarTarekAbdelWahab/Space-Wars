@@ -1,22 +1,25 @@
 #include "Sphere.h"
 #include "GameObject.h"
 #include <GL/glew.h>
-#include <GL/freeglut.h> 
+#include <GL/freeglut.h>
 #include <vector>
 #include "Bullet.h"
 
 #ifndef PLAYER_H_
 #define PLAYER_H_
 
-class Player: public GameObject{
+class Player : public GameObject
+{
 private:
     GLfloat angle, speed;
     int health, score, maxHealth;
     int list, upgrade, shootDelay;
-    //Weapon weapon;
+    unsigned int texture;
+    GLUquadricObj *qobjPlayer;
+    // Weapon weapon;
 public:
     Player();
-    Player(GLfloat angle, GLfloat speed, int health, int score, int list, Sphere shpere);
+    Player(GLfloat angle, GLfloat speed, int health, int score, int list, Sphere shpere, unsigned int texture);
     void update() override;
     void draw() override;
     void takeDamage(int damage);
