@@ -45,7 +45,6 @@ public:
     unsigned int texture[18];
     Game(int w, int h) : width(w), height(h)
     {
-        this->player = Player(0.0, 2., 100, 100, 10, Sphere(0., 0.0, -500., 5.));
         this->game_mode = GameMode();
         memset(keyState, false, sizeof(bool) * sizeof(keyState));
         frameCount = 0;
@@ -54,7 +53,7 @@ public:
 
     void restart(int mode)
     {
-        this->player = Player(0.0, 2., 100, 100, 10, Sphere(0., 0.0, -500., 5.));
+        this->player = Player(0.0, 2., 100, 100, 10, Sphere(0., 0.0, -500., 5.), texture[16]);
         memset(keyState, false, sizeof(bool) * sizeof(keyState));
         frameCount = 0;
         playerBullets.clear();
@@ -206,6 +205,7 @@ public:
         glEnable(GL_TEXTURE_2D);
 
         solarSystem.populate(texture);
+        this->player = Player(0.0, 2., 100, 100, 10, Sphere(0., 0.0, -500., 5.), texture[16]);
 
         // glEnable(GL_CULL_FACE);
         // glCullFace(GL_BACK);
