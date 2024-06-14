@@ -20,6 +20,7 @@ Planet::Planet(vector<GLfloat> color, GLfloat orbitRadius, GLfloat orbitSpeed, G
 
 void Planet::update()
 {
+
     orbitAngle += orbitSpeed;
     if (orbitAngle > 360.)
         orbitAngle -= 360.;
@@ -40,11 +41,12 @@ void Planet::draw()
     // glRotatef(90., 1., 0., 0.);
     // glRotatef(spinAngle, 0., 1., 0.);
     // glRotatef(spinAngle, 0.0, 1.0, 0.0);
-    glRotatef(90., 1.0, 0.0, 0.0);
+
+    glRotatef(-90.0, 1.0, 0.0, 0.0);
+    glRotatef(-spinAngle, 0.0, 0.0, 1.0);
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     gluQuadricTexture(qobj, GL_TRUE);
     glBindTexture(GL_TEXTURE_2D, texture);
-
     gluSphere(qobj, sphere.radius, 16, 16);
     glPopMatrix();
 }
