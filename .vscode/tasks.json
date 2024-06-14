@@ -21,6 +21,7 @@
                 "${fileDirname}\\Weapon.cpp",
                 "${fileDirname}\\PowerUp.cpp",
                 "${fileDirname}\\GameMode.cpp",
+                "${fileDirname}\\getBMP.cpp",
                 "-lopengl32",
                 "-lfreeglut",
                 "-lglew32",
