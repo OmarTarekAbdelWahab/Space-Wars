@@ -57,7 +57,6 @@ void GameMode::update(Player& player, std::vector<Enemy>& enemies){
             auto now_time = std::chrono::high_resolution_clock::now();
             if(now_time - prev_time >= std::chrono::seconds(2)){
                 prev_time = now_time;
-                cout << "hereeeeeeeeeeeeeeeeeeeeee";
                 PlaySound(TEXT("sounds/game-over.wav"), NULL, SND_FILENAME | SND_ASYNC);
                 this->display = MENU;
                 this->state = LOSE;
@@ -93,7 +92,7 @@ void GameMode::update(Player& player, std::vector<Enemy>& enemies){
                 this->state = WIN;
                 return;
             }
-            else if(time%100 == 0){
+            else if(time%50 == 0){
                 level++;
                 PlaySound(TEXT("sounds/next-level.wav"), NULL, SND_FILENAME | SND_ASYNC);
             }

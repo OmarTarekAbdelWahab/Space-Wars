@@ -106,9 +106,6 @@ public:
                 i--;
             }
         } 
-        // cout << "Bullets Size: " << bullets.size() << endl;
-        // cout << "Enemy Size: " << enemies.size() << endl;
-        // cout << player.getSphere().x << ' ' << player.getSphere().z << ' ' << player.getAngle() << endl;
         game_mode.update(player, enemies);
         solarSystem.update();
         player.update();
@@ -135,7 +132,6 @@ public:
         updateScene();
     }
     void mapView(void){
-        // cout << "Width " << width << " Height " << height << endl;
         glViewport(width*2/3, height*2/3, width*1/3, height*1/3);
         glLoadIdentity();
         // Draw a vertical line on the left of the viewport to separate the two viewports
@@ -196,12 +192,11 @@ public:
             if(checkSpheresIntersection(playerSphere.x, playerSphere.y, playerSphere.z, playerSphere.radius,
                 planetSphere.x, planetSphere.y, planetSphere.z, planetSphere.radius)){
                     auto now = std::chrono::high_resolution_clock::now();
-                    if(now - prev_time >= std::chrono::seconds(2)){
+                    if(now - prev_time >= std::chrono::seconds(2) && player.getHealth() > 0){
                         prev_time = now;
                         PlaySound(TEXT("sounds/destory.wav"), NULL, SND_FILENAME | SND_ASYNC);
                         std::this_thread::sleep_for(std::chrono::seconds(1));
                         player.takeDamage(150);
-                        cout << "Game  heree\n";
                         break;
                     }
                 }
@@ -240,7 +235,9 @@ public:
                     player.takeDamage(enemyBullets[bind].getDamage());
                     enemyBullets.erase(enemyBullets.begin()+bind);
                     bind--;
-                    PlaySound(TEXT("sounds/hurt.wav"), NULL, SND_FILENAME | SND_ASYNC);
+                    if(player.getHealth() > 0){
+                        PlaySound(TEXT("sounds/hurt.wav"), NULL, SND_FILENAME | SND_ASYNC);
+                    }
             }
         }
 
@@ -252,7 +249,9 @@ public:
                     player.applyPowerUp(powerUps[i]);
                     powerUps.erase(powerUps.begin() + i);
                     i--;
-                    PlaySound(TEXT("sounds/item-pick-up.wav"), NULL, SND_FILENAME | SND_ASYNC);
+                    if(player.getHealth() > 0){
+                        PlaySound(TEXT("sounds/item-pick-up.wav"), NULL, SND_FILENAME | SND_ASYNC);
+                    }
                     break;
             }
         }
@@ -283,18 +282,12 @@ public:
         }
     }
     void mouseInput(int button, int state, int x, int y){
-        cout << "Mouse Clicked at: " << x << ' ' << y << endl;
-        cout << "Game Mode: " << game_mode.getDisplay() << endl;
         if(game_mode.getDisplay() == MENU){
             if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
                 if (x >= 120 && x <= 375 && y >= 260 && y <= 300) {
-                    // Option 1 was clicked
-                    cout << "Option 1 was clicked" << endl;
                     game_mode.chooseMode(SURVIVAL);
                     restart(SURVIVAL);
                 } else if (x >= 120 && x <= 375 && y >= 310 && y <= 350) {
-                    // Option 2 was clicked
-                    cout << "Option 2 was clicked" << endl;
                     game_mode.chooseMode(TIMER);
                     restart(TIMER);
                 }

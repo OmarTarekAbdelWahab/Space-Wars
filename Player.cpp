@@ -68,7 +68,9 @@ void Player::upgradeWeapon(){
 }
 vector<Bullet> Player::shoot()
 {
-    PlaySound(TEXT("sounds/bullet.wav"), NULL, SND_FILENAME | SND_ASYNC);
+    if(this->getHealth() > 0){
+        PlaySound(TEXT("sounds/bullet.wav"), NULL, SND_FILENAME | SND_ASYNC);
+    }
     vector<Bullet> bullets;
     shootDelay = 30;
     bullets = weapon.getBullets(Sphere(sphere.x+sphere.radius*sin(angle*M_PI/180.0), 
