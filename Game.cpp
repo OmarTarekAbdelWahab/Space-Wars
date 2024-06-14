@@ -240,6 +240,7 @@ public:
                     player.takeDamage(enemyBullets[bind].getDamage());
                     enemyBullets.erase(enemyBullets.begin()+bind);
                     bind--;
+                    PlaySound(TEXT("sounds/hurt.wav"), NULL, SND_FILENAME | SND_ASYNC);
             }
         }
 
