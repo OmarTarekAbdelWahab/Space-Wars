@@ -216,7 +216,7 @@ public:
         glViewport(0, 0, w, h);
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        glFrustum(-5.0 - (w - 500) / 100.0, 5.0 + (w - 500) / 100.0, -5.0 - (h - 500) / 100.0, 5.0 + (h - 500) / 100.0, 5.0, 2000.0);
+        glFrustum(-5.0 - (w - 500) / 100.0, 5.0 + (w - 500) / 100.0, -5.0 - (h - 500) / 100.0, 5.0 + (h - 500) / 100.0, 5.0, 8400.0);
 
         glMatrixMode(GL_MODELVIEW);
         width = w, height = h;
@@ -236,6 +236,82 @@ public:
             bullet.draw();
         for (PowerUp &power : powerUps)
             power.draw();
+
+        glPushMatrix();
+        glColor3f(1.0, 1.0, 1.0);
+        glBindTexture(GL_TEXTURE_2D, texture[15]);
+        glBegin(GL_POLYGON);
+        glTexCoord2f(0.0, 0.0);
+        glVertex3f(-3000.0, -200.0, 3000.0);
+        glTexCoord2f(1.0, 0.0);
+        glVertex3f(3000.0, -200.0, 3000.0);
+        glTexCoord2f(1.0, 1.0);
+        glVertex3f(3000.0, -200.0, -3000.0);
+        glTexCoord2f(0.0, 1.0);
+        glVertex3f(-3000.0, -200.0, -3000.0);
+        glEnd();
+
+        glBindTexture(GL_TEXTURE_2D, texture[15]);
+        glBegin(GL_POLYGON);
+        glTexCoord2f(0.0, 0.0);
+        glVertex3f(-3000.0, 2100.0, 3000.0);
+        glTexCoord2f(1.0, 0.0);
+        glVertex3f(3000.0, 2100.0, 3000.0);
+        glTexCoord2f(1.0, 1.0);
+        glVertex3f(3000.0, 2100.0, -3000.0);
+        glTexCoord2f(0.0, 1.0);
+        glVertex3f(-3000.0, 2100.0, -3000.0);
+        glEnd();
+
+        glBindTexture(GL_TEXTURE_2D, texture[15]);
+        glBegin(GL_POLYGON);
+        glTexCoord2f(0.0, 0.0);
+        glVertex3f(-3000.0, -200.0, 3000.0);
+        glTexCoord2f(1.0, 0.0);
+        glVertex3f(-3000.0, -200.0, -3000.0);
+        glTexCoord2f(1.0, 1.0);
+        glVertex3f(-3000.0, 2100.0, -3000.0);
+        glTexCoord2f(0.0, 1.0);
+        glVertex3f(-3000.0, 2100.0, 3000.0);
+        glEnd();
+
+        glBindTexture(GL_TEXTURE_2D, texture[15]);
+        glBegin(GL_POLYGON);
+        glTexCoord2f(0.0, 0.0);
+        glVertex3f(3000.0, -200.0, 3000.0);
+        glTexCoord2f(1.0, 0.0);
+        glVertex3f(3000.0, 2100.0, 3000.0);
+        glTexCoord2f(1.0, 1.0);
+        glVertex3f(3000.0, 2100.0, -3000.0);
+        glTexCoord2f(0.0, 1.0);
+        glVertex3f(3000.0, -200.0, -3000.0);
+        glEnd();
+
+        glBindTexture(GL_TEXTURE_2D, texture[15]);
+        glBegin(GL_POLYGON);
+        glTexCoord2f(0.0, 0.0);
+        glVertex3f(3000.0, -200.0, 3000.0);
+        glTexCoord2f(1.0, 0.0);
+        glVertex3f(-3000.0, -200.0, 3000.0);
+        glTexCoord2f(1.0, 1.0);
+        glVertex3f(-3000.0, 2100.0, 3000.0);
+        glTexCoord2f(0.0, 1.0);
+        glVertex3f(3000.0, 2100.0, 3000.0);
+        glEnd();
+
+        glBindTexture(GL_TEXTURE_2D, texture[15]);
+        glBegin(GL_POLYGON);
+        glTexCoord2f(0.0, 0.0);
+        glVertex3f(-3000.0, -200.0, -3000.0);
+        glTexCoord2f(1.0, 0.0);
+        glVertex3f(3000.0, -200.0, -3000.0);
+        glTexCoord2f(1.0, 1.0);
+        glVertex3f(3000.0, 2100.0, -3000.0);
+        glTexCoord2f(0.0, 1.0);
+        glVertex3f(-3000.0, 2100.0, -3000.0);
+        glEnd();
+
+        glPopMatrix();
     }
     void handleCollision()
     {
