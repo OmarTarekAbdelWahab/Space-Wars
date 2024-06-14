@@ -18,6 +18,16 @@ Planet::Planet(vector<GLfloat> color, GLfloat orbitRadius, GLfloat orbitSpeed, G
     qobj = gluNewQuadric();
 }
 
+void Planet::setMoon(unsigned int moonTexture)
+{
+    hasMoon = true;
+    this->moonTexture = moonTexture;
+    moonOrbitSpeed = 1.0;
+    moonOrbitAngle = 0.0;
+    moonSpinSpeed = 1.0;
+    moonSpinAngle = 0.0;
+}
+
 void Planet::update()
 {
     orbitAngle += orbitSpeed;
@@ -28,6 +38,15 @@ void Planet::update()
         spinAngle -= 360.;
     sphere.x = orbitRadius * sin(orbitAngle * M_PI / 180.0);
     sphere.z = orbitRadius * cos(orbitAngle * M_PI / 180.0);
+    if (hasMoon)
+    {
+        moonOrbitAngle += moonOrbitSpeed;
+        if (moonOrbitAngle > 360.)
+            moonOrbitAngle -= 360.;
+        moonSpinAngle += moonSpinSpeed;
+        if (moonSpinAngle > 360.)
+            moonSpinAngle -= 360.;
+    }
 }
 void Planet::draw()
 {
@@ -60,6 +79,18 @@ void Planet::draw()
     gluQuadricTexture(qobj, GL_TRUE);
     glBindTexture(GL_TEXTURE_2D, texture);
     gluSphere(qobj, sphere.radius, 16, 16);
+
+    if (hasMoon)
+    {
+        glRotatef(moonOrbitAngle, 0.0, 1.0, 0.0);
+        glTranslatef(55.0, 0.0, 0.0);
+        glRotatef(-90.0, 1.0, 0.0, 0.0);
+        glRotatef(-moonSpinAngle, 0.0, 0.0, 1.0);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        gluQuadricTexture(qobj, GL_TRUE);
+        glBindTexture(GL_TEXTURE_2D, moonTexture);
+        gluSphere(qobj, 8.0, 16, 16);
+    }
 
     glPopMatrix();
     if (sphere.radius == 80.0)

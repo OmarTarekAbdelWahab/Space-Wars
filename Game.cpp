@@ -201,7 +201,7 @@ public:
         glEnable(GL_LIGHTING);
         glGenTextures(18, texture);
         loadTextures();
-        glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+        glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
         glEnable(GL_TEXTURE_2D);
 
         solarSystem.populate(texture);
@@ -238,6 +238,8 @@ public:
             power.draw();
 
         glPushMatrix();
+        glDisable(GL_LIGHTING);
+
         glColor3f(1.0, 1.0, 1.0);
         glBindTexture(GL_TEXTURE_2D, texture[15]);
         glBegin(GL_POLYGON);
@@ -310,6 +312,8 @@ public:
         glTexCoord2f(0.0, 1.0);
         glVertex3f(-3000.0, 2100.0, -3000.0);
         glEnd();
+
+        glEnable(GL_LIGHTING);
 
         glPopMatrix();
     }

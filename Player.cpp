@@ -109,7 +109,7 @@ void Player::draw()
 {
     glPushMatrix();
 
-    GLfloat matAmbANdDif[] = {1.0, 1.0, 0.0, 1.0};
+    GLfloat matAmbANdDif[] = {1.0, 1.0, 1.0, 1.0};
     GLfloat matSpec[] = {1.0, 1.0, 1.0, 1.0};
     GLfloat matShine[] = {50.0};
 
@@ -134,6 +134,7 @@ void Player::drawHealthBar(void)
 {
     glDisable(GL_LIGHTING);
     // draw health bar:
+    glClearColor(0.0, 0.0, 0.0, 1.0);
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     if (speedBoostTimer > 0)
     {
@@ -156,7 +157,8 @@ void Player::drawHealthBar(void)
     }
     glPushMatrix();
     glTranslatef(0.0, 0.0, -5.0);
-    glColor3f(1.0, 0.0, 0.0);
+    glDisable(GL_LIGHTING);
+    glColor3f(1.0, 1.0, 0.0);
     glBegin(GL_POLYGON);
     glVertex3f(-5.0, 5.0, 0.0);
     glVertex3f(-5.0, 4.5, 0.0);
@@ -170,6 +172,7 @@ void Player::drawHealthBar(void)
     glVertex3f(-1.0, 4.5, 0.0);
     glVertex3f(-1.0, 5.0, 0.0);
     glEnd();
+    glEnable(GL_LIGHTING);
     glPopMatrix();
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINES);
     glEnable(GL_LIGHTING);

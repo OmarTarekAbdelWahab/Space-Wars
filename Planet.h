@@ -13,6 +13,10 @@ class Planet : public GameObject
     std::vector<GLfloat> color;
     unsigned int texture;
     GLUquadricObj *qobj;
+    bool hasMoon = false;
+    unsigned int moonTexture;
+    float moonOrbitSpeed, moonOrbitAngle;
+    float moonSpinSpeed, moonSpinAngle;
 
     // Planet moon();
 public:
@@ -21,6 +25,7 @@ public:
     ~Planet();
     void update() override;
     void draw() override;
+    void setMoon(unsigned int moonTexture);
 };
 
 #endif

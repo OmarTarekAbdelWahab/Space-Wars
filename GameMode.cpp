@@ -129,6 +129,8 @@ void GameMode::update(Player &player, std::vector<Enemy> &enemies, unsigned int 
 
 void GameMode::draw()
 {
+    glDisable(GL_LIGHTING);
+    glClearColor(0.0, 0.0, 0.0, 1.0);
     string text;
     if (this->game_mode == SURVIVAL)
     {
@@ -140,7 +142,9 @@ void GameMode::draw()
     }
     glPushMatrix();
     glTranslatef(0.0, 0.0, -5.0);
-    glColor3f(1.0, 0.0, 0.0);
+    glDisable(GL_LIGHTING);
+
+    glColor3f(1.0, 1.0, 0.0);
     glRasterPos2f(-5, 4);
     for (char c : text)
     {
@@ -156,11 +160,13 @@ void GameMode::draw()
     {
         drawOptions();
     }
+    glEnable(GL_LIGHTING);
 }
 
 // need to put menu options on the screen and tell him if he win or lose
 void GameMode::drawOptions()
 {
+
     string text;
     if (this->state == WIN)
     {
@@ -171,10 +177,11 @@ void GameMode::drawOptions()
         text = "You Lose!!!";
     }
 
+    glDisable(GL_LIGHTING);
     glPushMatrix();
     glLineWidth(2.0f);
     glTranslatef(0.0, 0.0, -5.0);
-    glColor3f(0.0, 0.0, 1.0);
+    glColor3f(1.0, 1.0, 0.0);
     glScalef(0.005f, 0.005f, 1.0f);
     glTranslatef(-300.0f, 320.0f, 0.0f);
     for (char c : text)
@@ -195,6 +202,7 @@ void GameMode::drawOptions()
     }
     glLineWidth(1.0f);
     glPopMatrix();
+    glEnable(GL_LIGHTING);
 }
 
 int GameMode::getDisplay()
