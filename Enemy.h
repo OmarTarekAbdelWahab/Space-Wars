@@ -4,16 +4,20 @@
 #ifndef ENEMY_H_
 #define ENEMY_H_
 
-class Enemy: public GameObject{
+class Enemy : public GameObject
+{
 private:
     GLfloat angle, speed;
     int health, difficulty;
     std::vector<GLfloat> color;
     int shootDelay;
     bool stop = false;
+    GLUquadricObj *qobjEnemy;
+    unsigned int texture;
+
 public:
     Enemy();
-    Enemy(Sphere sphere, std::vector<GLfloat> color, GLfloat angle, GLfloat speed, int health, int difficulty);
+    Enemy(Sphere sphere, std::vector<GLfloat> color, GLfloat angle, GLfloat speed, int health, int difficulty, unsigned int texture);
     ~Enemy();
     void update(void) override;
     void draw(void) override;

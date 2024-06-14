@@ -119,7 +119,7 @@ public:
                 i--;
             }
         }
-        game_mode.update(player, enemies);
+        game_mode.update(player, enemies, texture[17]);
         solarSystem.update();
         player.update();
         for (PowerUp &power : powerUps)

@@ -1,6 +1,6 @@
 #include "Sphere.h"
 #include <GL/glew.h>
-#include <GL/freeglut.h> 
+#include <GL/freeglut.h>
 #include "Player.h"
 #include "Enemy.h"
 #include <vector>
@@ -8,7 +8,8 @@
 #ifndef GameMode_H_
 #define GameMode_H_
 
-class GameMode{
+class GameMode
+{
     int state;
     int display;
     int game_mode;
@@ -20,7 +21,7 @@ class GameMode{
 public:
     GameMode();
     void chooseMode(int game_mode);
-    void update(Player& player, std::vector<Enemy>& enemies);
+    void update(Player &player, std::vector<Enemy> &enemies, unsigned int enemyTexture);
     void update_kill();
     void draw();
     void drawOptions();
