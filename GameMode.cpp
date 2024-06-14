@@ -5,6 +5,11 @@
 #include "Enemy.h"
 #include "Player.h"
 #include <string>
+#include <windows.h>
+#include <mmsystem.h>
+#include <thread>
+#include <iostream>
+#pragma comment(lib, "winmm.lib")
 
 #define SURVIVAL 0
 #define TIMER 1
@@ -49,12 +54,19 @@ void GameMode::update(Player& player, std::vector<Enemy>& enemies){
     if(this->game_mode == SURVIVAL){
         if(player.getHealth() <= 0){
             // game will stop
-            this->display = MENU;
-            this->state = LOSE;
-            return;
+            auto now_time = std::chrono::high_resolution_clock::now();
+            if(now_time - prev_time >= std::chrono::seconds(2)){
+                prev_time = now_time;
+                cout << "hereeeeeeeeeeeeeeeeeeeeee";
+                PlaySound(TEXT("sounds/game-over.wav"), NULL, SND_FILENAME | SND_ASYNC);
+                this->display = MENU;
+                this->state = LOSE;
+                return;
+            }
         }
         if(enemies.size() == 0){
             level++;
+            PlaySound(TEXT("sounds/next-level.wav"), NULL, SND_FILENAME | SND_ASYNC);
             for(int i = 0; i < level*2; i++){
                 GLfloat x = rand()%1000 - 500;
                 GLfloat z = rand()%1000 - 500;
@@ -66,6 +78,7 @@ void GameMode::update(Player& player, std::vector<Enemy>& enemies){
     else{
         if(player.getHealth() <= 0){
             // game will stop
+            PlaySound(TEXT("sounds/game-over.wav"), NULL, SND_FILENAME | SND_ASYNC);
             this->display = MENU;
             this->state = LOSE;
             return;
@@ -82,6 +95,7 @@ void GameMode::update(Player& player, std::vector<Enemy>& enemies){
             }
             else if(time%100 == 0){
                 level++;
+                PlaySound(TEXT("sounds/next-level.wav"), NULL, SND_FILENAME | SND_ASYNC);
             }
 
             if(time%10 == 0){

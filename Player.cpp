@@ -4,6 +4,9 @@
 #include <GL/glew.h>
 #include <GL/freeglut.h> 
 #include "PowerUp.h"
+#include <windows.h>
+#include <mmsystem.h>
+#pragma comment(lib, "winmm.lib")
 using namespace std;
 Player::Player(){}
 Player::Player(GLfloat angle, GLfloat speed, int health, int score, int list, Sphere sphere) 
@@ -65,6 +68,7 @@ void Player::upgradeWeapon(){
 }
 vector<Bullet> Player::shoot()
 {
+    PlaySound(TEXT("sounds/bullet.wav"), NULL, SND_FILENAME | SND_ASYNC);
     vector<Bullet> bullets;
     shootDelay = 30;
     bullets = weapon.getBullets(Sphere(sphere.x+sphere.radius*sin(angle*M_PI/180.0), 

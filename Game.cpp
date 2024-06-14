@@ -11,6 +11,10 @@
 #include "Enemy.h"
 #include <random>
 #include "GameMode.h"
+#include <windows.h>
+#include <mmsystem.h>
+#include <thread>
+#pragma comment(lib, "winmm.lib")
 
 #define SURVIVAL 0
 #define TIMER 1
@@ -32,6 +36,7 @@ private:
     vector<Bullet> playerBullets;
     vector<Enemy> enemies;
     vector<PowerUp> powerUps;
+    chrono::system_clock::time_point prev_time = std::chrono::high_resolution_clock::now();
 public:
     int frameCount;
     Game(int w, int h): width(w), height(h){
@@ -40,6 +45,7 @@ public:
         solarSystem.populate();
         memset(keyState, false, sizeof(bool)*sizeof(keyState));
         frameCount = 0;
+        prev_time = std::chrono::high_resolution_clock::now();
     }
 
     
@@ -189,8 +195,15 @@ public:
             Sphere planetSphere = planet.getSphere();
             if(checkSpheresIntersection(playerSphere.x, playerSphere.y, playerSphere.z, playerSphere.radius,
                 planetSphere.x, planetSphere.y, planetSphere.z, planetSphere.radius)){
-                    player.takeDamage(150);
-                    cout << "Game Over\n";
+                    auto now = std::chrono::high_resolution_clock::now();
+                    if(now - prev_time >= std::chrono::seconds(2)){
+                        prev_time = now;
+                        PlaySound(TEXT("sounds/destory.wav"), NULL, SND_FILENAME | SND_ASYNC);
+                        std::this_thread::sleep_for(std::chrono::seconds(1));
+                        player.takeDamage(150);
+                        cout << "Game  heree\n";
+                        break;
+                    }
                 }
         }
         // // Collision Enemy Body & Player Body (Not Used Anymore)
@@ -212,6 +225,7 @@ public:
                     playerBullets.erase(playerBullets.begin()+bind);
                     bind--;
                     game_mode.update_kill();
+                    PlaySound(TEXT("sounds/pop.wav"), NULL, SND_FILENAME | SND_ASYNC);
                     break;
                 }
             }
@@ -237,6 +251,8 @@ public:
                     player.applyPowerUp(powerUps[i]);
                     powerUps.erase(powerUps.begin() + i);
                     i--;
+                    PlaySound(TEXT("sounds/item-pick-up.wav"), NULL, SND_FILENAME | SND_ASYNC);
+                    break;
             }
         }
     }
